@@ -1,6 +1,12 @@
+import 'package:flutter/material.dart';
+
 import 'package:admin_dashboard/services/local_storage.dart';
 import 'package:admin_dashboard/services/navigation_service.dart';
-import 'package:flutter/material.dart';
+import 'package:admin_dashboard/services/notifications_service.dart';
+
+import 'package:admin_dashboard/api/backend_api.dart';
+
+import 'package:admin_dashboard/models/http/auth_response.dart';
 
 enum AuthStatus {
   checking,
@@ -9,39 +15,93 @@ enum AuthStatus {
 }
 
 class AuthProvider extends ChangeNotifier {
-  String? _token;
   AuthStatus authStatus = AuthStatus.checking;
+  User? user;
 
   AuthProvider() {
     isAuthenticated();
   }
 
   login(String email, String password) {
-    //TODO: HTTP request
+    final data = {
+      'email': email,
+      'password': password,
+    };
 
-    _token = 'sdaffsdafsdal;fdasjkfjlkdsflk;js';
-    LocalStorage.preferences!.setString('token', _token!);
+    BackendApi.post('/auth/login', data).then((json) {
+      final authResponse = AuthResponse.fromJson(json);
+      user = authResponse.user;
 
-    // Navigate to dashboard
-    authStatus = AuthStatus.authenticated;
-    notifyListeners();
+      // _token = 'sdaffsdafsdal;fdasjkfjlkdsflk;js';
+      LocalStorage.preferences!.setString('token', authResponse.token);
 
-    NavigationService.replaceTo('/dashboard');
+      // Navigate to dashboard
+      authStatus = AuthStatus.authenticated;
+
+      BackendApi.configureDio();
+
+      notifyListeners();
+      NavigationService.replaceTo('/dashboard');
+    }).catchError((err) {
+      NotificationService.showSnackbarError(err.toString());
+    });
+  }
+
+  register(String email, String password, String name) {
+    final data = {
+      'name': name,
+      'email': email,
+      'password': password,
+    };
+
+    BackendApi.post('/users', data).then((json) {
+      final authResponse = AuthResponse.fromJson(json);
+      user = authResponse.user;
+
+      // Navigate to dashboard
+      authStatus = AuthStatus.authenticated;
+      LocalStorage.preferences!.setString('token', authResponse.token);
+
+      BackendApi.configureDio();
+
+      notifyListeners();
+      NavigationService.replaceTo('/dashboard');
+    }).catchError((err) {
+      NotificationService.showSnackbarError(err.toString());
+    });
+
+    // _token = 'sdaffsdafsdal;fdasjkfjlkdsflk;js';
   }
 
   Future<bool> isAuthenticated() async {
     final token = LocalStorage.preferences!.getString('token');
+
     if (token == null) {
       authStatus = AuthStatus.notAuthenticated;
       notifyListeners();
       return false;
     }
+    try {
+      final response = await BackendApi.httpGet('/auth');
+      final authResponse = AuthResponse.fromJson(response);
 
-    //TODO: backend HTTP request to check if JWt is valid.
+      //Save new token
+      LocalStorage.preferences!.setString('token', authResponse.token);
+      user = authResponse.user;
+      authStatus = AuthStatus.authenticated;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      // print(e);
+      authStatus = AuthStatus.notAuthenticated;
+      notifyListeners();
+      return false;
+    }
+  }
 
-    await Future.delayed(Duration(milliseconds: 1000));
-    authStatus = AuthStatus.authenticated;
+  logout() {
+    LocalStorage.preferences!.remove('token');
+    authStatus = AuthStatus.notAuthenticated;
     notifyListeners();
-    return true;
   }
 }

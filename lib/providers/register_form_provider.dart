@@ -11,8 +11,10 @@ class RegisterFormProvider extends ChangeNotifier {
     if (formKey.currentState!.validate()) {
       print('Form is valid');
       print('$name - $email - $password');
+      return true;
     } else {
       print('Form is not valid');
+      return false;
     }
   }
 }

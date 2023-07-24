@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 
 import 'package:admin_dashboard/services/navigation_service.dart';
 import 'package:admin_dashboard/services/local_storage.dart';
+import 'package:admin_dashboard/services/notifications_service.dart';
+
+import 'package:admin_dashboard/api/backend_api.dart';
 
 import 'package:admin_dashboard/providers/auth_provider.dart';
 import 'package:admin_dashboard/providers/sidemenu_provider.dart';
@@ -14,8 +17,8 @@ import 'package:admin_dashboard/ui/layouts/splash/splash_layout.dart';
 
 void main() async {
   await LocalStorage.configurePreferences();
+  BackendApi.configureDio();
   Flurorouter.configureRoutes();
-
   runApp(const AppState());
 }
 
@@ -45,6 +48,7 @@ class MyApp extends StatelessWidget {
         initialRoute: '/',
         onGenerateRoute: Flurorouter.router.generator,
         navigatorKey: NavigationService.navigatorKey,
+        scaffoldMessengerKey: NotificationService.scaffoldKey,
         builder: (context, child) {
           final authProvider = Provider.of<AuthProvider>(context);
 
