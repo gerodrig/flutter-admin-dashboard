@@ -17,7 +17,7 @@ class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
 
   void navigateTo(String routeName) {
-    NavigationService.navigateTo(routeName);
+    NavigationService.replaceTo(routeName);
     SideMenuProvider.closeMenu();
   }
 
@@ -51,11 +51,15 @@ class Sidebar extends StatelessWidget {
             text: 'Analytics',
             icon: Icons.show_chart_outlined,
             onPressed: () {},
+            // isActive:
+            //     sideMenuProvider.currentPage == Flurorouter.analyticsRoute,
           ),
           MenuItem(
             text: 'Categories',
             icon: Icons.layers_outlined,
-            onPressed: () {},
+            onPressed: () => navigateTo(Flurorouter.categoriesRoute),
+            isActive:
+                sideMenuProvider.currentPage == Flurorouter.categoriesRoute,
           ),
           MenuItem(
             text: 'Products',
@@ -70,7 +74,8 @@ class Sidebar extends StatelessWidget {
           MenuItem(
             text: 'Customers',
             icon: Icons.people_alt_outlined,
-            onPressed: () {},
+            onPressed: () => navigateTo(Flurorouter.usersRoute),
+            isActive: sideMenuProvider.currentPage == Flurorouter.usersRoute,
           ),
           const SizedBox(height: 30),
           const TextSeparator(text: 'Ui Elements'),

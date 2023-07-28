@@ -33,6 +33,48 @@ class DashboardHandlers {
     }
   });
 
+  static Handler categories = Handler(handlerFunc: (context, params) {
+    final authProvider = Provider.of<AuthProvider>(context!);
+    Provider.of<SideMenuProvider>(context, listen: false)
+        .setCurrentPageUrl(Flurorouter.categoriesRoute);
+
+    if (authProvider.authStatus == AuthStatus.notAuthenticated) {
+      return const LoginView();
+    } else {
+      return const Categoriesview();
+    }
+  });
+
+  //Users Handler
+  static Handler users = Handler(handlerFunc: (context, params) {
+    final authProvider = Provider.of<AuthProvider>(context!);
+    Provider.of<SideMenuProvider>(context, listen: false)
+        .setCurrentPageUrl(Flurorouter.categoriesRoute);
+
+    if (authProvider.authStatus == AuthStatus.notAuthenticated) {
+      return const LoginView();
+    } else {
+      return const UsersView();
+    }
+  });
+
+  //User Handler
+  static Handler user = Handler(handlerFunc: (context, params) {
+    final authProvider = Provider.of<AuthProvider>(context!);
+    Provider.of<SideMenuProvider>(context, listen: false)
+        .setCurrentPageUrl(Flurorouter.userRoute);
+
+    if (authProvider.authStatus == AuthStatus.notAuthenticated) {
+      return const LoginView();
+    } else {
+      if (params['uid']?.first != null) {
+        return UserView(uid: params['uid']!.first);
+      }
+
+      return const UsersView();
+    }
+  });
+
   static Handler blank = Handler(handlerFunc: (context, params) {
     final authProvider = Provider.of<AuthProvider>(context!);
     Provider.of<SideMenuProvider>(context, listen: false)

@@ -22,7 +22,7 @@ class BackendApi {
 
       return response.data;
     } on DioError catch (e) {
-      throw (errorMessage(e) ?? 'Request Error');
+      throw ('Request Error $e');
     }
   }
 
@@ -59,8 +59,7 @@ class BackendApi {
   }
 
   static Future uploadFile(String path, Uint8List bytes) async {
-    final formData =
-        FormData.fromMap({'archivo': MultipartFile.fromBytes(bytes)});
+    final formData = FormData.fromMap({'file': MultipartFile.fromBytes(bytes)});
 
     try {
       final resp = await _dio.put(path, data: formData);

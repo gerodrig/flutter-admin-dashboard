@@ -7,6 +7,7 @@ import 'package:admin_dashboard/services/notifications_service.dart';
 import 'package:admin_dashboard/api/backend_api.dart';
 
 import 'package:admin_dashboard/models/http/auth_response.dart';
+import 'package:admin_dashboard/models/User.dart';
 
 enum AuthStatus {
   checking,
